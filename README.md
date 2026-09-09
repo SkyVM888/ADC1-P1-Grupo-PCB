@@ -1,7 +1,7 @@
-# Arquitectura-de-Computadoras-GR20
+## Arquitectura-de-Computadoras-GR20
 
-#Estudiantes:
+# Estudiantes:
 
 Luis Pablo Vargas Muñoz || 2021490483 
 Carlos || 2021490483 || Charlespixel
-Brayan || 2021490483
+Brayan Ariel Vargas Rojas || 2021028522 || BrayanVR21
