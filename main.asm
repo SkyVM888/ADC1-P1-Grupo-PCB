@@ -1,8 +1,10 @@
 ;========================================================================
 ; 
-; Titulo: Main_Loop 0.1
-; Autor: Brayan Ariel Vargas Rojas
-;
+; Titulo: Main 0.1
+; Autores:  Carlos Daniel Hurtado Villalobos
+;           Luis Pablo Vargas Muñoz
+;           Brayan Ariel Vargas Rojas
+;           
 ;========================================================================
 .model small
 
