@@ -21,7 +21,7 @@ Suma_arreglo PROC
 
         mov BX,[BP+SI] ;leer el elemento del arreglo
         add AX,BX    ; AX=AX+BX
-        add SI,2     ; debiera de avanzar 2 bytes pero si cambiamos el dato a DB debe de ser 1. 
+        add SI,1     ; debiera de avanzar 1bytes. 
         loop suma_bucle ; repetir mientas cx sea diferente de 0. 
 
     POP SI
