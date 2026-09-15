@@ -1,5 +1,5 @@
 ;=========================================================
-; PRUEBA DE MIN_
+; PRUEBA DE MAX_
 ;=========================================================
 
 .model small
@@ -7,9 +7,9 @@
 
 .data
 
-    arreglo DB 100,-10,120,-10,5
+    arreglo DB 100,-50,120,-10,5
 
-    mensaje DB 13,10,"Minimo = $"
+    mensaje DB 13,10,"Maximo = $"
 
     resultado DW ?
 
@@ -27,8 +27,8 @@ main PROC
     ; AL = N
     MOV AL,5
 
-    ; Probar TU funcion
-    CALL Min_
+    ; Llamar funcion
+    CALL Max_
 
     ; Guardar resultado
     MOV resultado,AX
@@ -52,7 +52,7 @@ main ENDP
 
 
 ;=========================================================
-; TU FUNCION MIN_ EXACTAMENTE COMO LA PASASTE
+; TU FUNCION MAX_
 ;=========================================================
 
 ;Carlos Hurtado
@@ -61,10 +61,10 @@ main ENDP
 ;ENTRADA BP=DIRECCION ARREGLO
 ;AL=N
 
-;SALIDA AX=MINIMO
+;SALIDA AX=maximo
 
 
-Min_ PROC
+Max_ PROC
     PUSH BX
     PUSH CX
     PUSH SI
@@ -79,17 +79,18 @@ Min_ PROC
 
     ADD SI,1
     DEC CX  ; TIENE QUE IR DECRECIENDO
+    
 
-    min_bug: 
+    max_bug: 
 
         MOV DL, [BX + SI]
-        CMP DL,AL ;COMPARAR ELEMENTOS CON EL MINIMO ACTUAL
+        CMP DL,AL ;COMPARAR ELEMENTOS CON EL MAXIMO ACTUAL
 
-        JL nuevo_minimo   ; si DL< AL, nuevo minimo 
+        JG nuevo_maximo   ; SOOLO ES CAMBIAR ESTO POR QUE DE JL A JG
 
     continuar:
         add SI,1 ;avanzar 1 byte
-        loop min_bug
+        loop max_bug
 
         CBW   ; EXTERDER EL SIGNO. 
 
@@ -99,11 +100,11 @@ Min_ PROC
         POP BX
         RET
  
-    nuevo_minimo:
-        mov AL,DL ; guardaer el nuevo minimo 
+    nuevo_maximo:
+        mov AL,DL ; guardaer el nuevo MAX
         JMP continuar
 
-Min_ ENDP
+Max_ ENDP
 
 
 ;=========================================================
@@ -121,7 +122,7 @@ PrintAX PROC
     CMP AX,0
     JGE positivo
 
-    ; Imprimir "-"
+    ; Imprimir signo -
     PUSH AX
     MOV DL,'-'
     MOV AH,02h
