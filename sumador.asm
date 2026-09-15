@@ -14,21 +14,21 @@ Suma_arreglo PROC
     PUSH SI
     PUSH DX
 
-
-
 ;---------------------------------------------------------------------------------------------------------------------------
 
     mov CL,AL  ; Copiar el valor de N a CL  CL=N
     mov CH,0   ; poner el 0 la parte alta 
+    
+    mov AX,0  
     mov DX,0 
     mov SI,0  ;SI=0 INDICE
     
+    MOV BX,BP     ;BX tiene la direccion del arreglo 
 ;------------------------------------------------------Parte del bulce------------------------------------------------------
 
     suma_bucle:
 
-        mov BL,[BP+SI] ;leer el elemento del arreglo
-        mov AL,BL    ;pasar elemento a al
+        mov AL,[BX+SI] ;leer el elemento del arreglo
         CBW   ; convertir al con signo a AX
 
         add DX,AX  
