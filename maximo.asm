@@ -4,10 +4,10 @@
 ;ENTRADA BP=DIRECCION ARREGLO
 ;AL=N
 
-;SALIDA AX=MINIMO
+;SALIDA AX=maximo
 
 
-Min_ PROC
+Max_ PROC
     PUSH BX
     PUSH CX
     PUSH SI
@@ -24,16 +24,16 @@ Min_ PROC
     DEC CX  ; TIENE QUE IR DECRECIENDO
     
 
-    min_bug: 
+    max_bug: 
 
         MOV DL, [BX + SI]
-        CMP DL,AL ;COMPARAR ELEMENTOS CON EL MINIMO ACTUAL
+        CMP DL,AL ;COMPARAR ELEMENTOS CON EL MAXIMO ACTUAL
 
-        JL nuevo_minimo   ; si DL< AL, nuevo minimo 
+        JG nuevo_maximo   ; SOOLO ES CAMBIAR ESTO POR QUE  DE JL A JG
 
     continuar:
         add SI,1 ;avanzar 1 byte
-        loop min_bug
+        loop max_bug
 
         CBW   ; EXTERDER EL SIGNO. 
 
@@ -43,9 +43,9 @@ Min_ PROC
         POP BX
         RET
  
-    nuevo_minimo:
-        mov AL,DL ; guardaer el nuevo minimo 
+    nuevo_maximo:
+        mov AL,DL ; guardaer el nuevo MAX
         JMP continuar
 
-Min_ ENDP 
+Max_ ENDP 
 
