@@ -38,11 +38,10 @@ Suma_arreglo PROC
 
         mov AX,DX  ; pasar a la suma final de ax
 
-    POP SI
-    POP CX
-    POP BX
-    POP DX
-
-    RET
+        POP DX
+        POP SI
+        POP CX
+        POP BX
+        RET
 
 Suma_arreglo ENDP
