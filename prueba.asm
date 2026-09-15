@@ -1,5 +1,5 @@
 ;=========================================================
-; PRUEBA SUMA_ARREGLO
+; PRUEBA DE MIN_
 ;=========================================================
 
 .model small
@@ -7,9 +7,9 @@
 
 .data
 
-    arreglo DB -10,-20,-30,-40,-50
+    arreglo DB 100,-10,120,-10,5
 
-    mensaje DB 13,10,"Suma = $"
+    mensaje DB 13,10,"Minimo = $"
 
     resultado DW ?
 
@@ -27,13 +27,13 @@ main PROC
     ; AL = N
     MOV AL,5
 
-    ; Llamar funcion
-    CALL Suma_arreglo
+    ; Probar TU funcion
+    CALL Min_
 
-    ; Guardar resultado ANTES de imprimir
+    ; Guardar resultado
     MOV resultado,AX
 
-    ; Mostrar "Suma = "
+    ; Mostrar mensaje
     MOV DX,OFFSET mensaje
     MOV AH,09h
     INT 21h
@@ -41,7 +41,7 @@ main PROC
     ; Recuperar resultado
     MOV AX,resultado
 
-    ; Imprimir AX
+    ; Mostrar AX
     CALL PrintAX
 
     ; Terminar programa
@@ -52,55 +52,62 @@ main ENDP
 
 
 ;=========================================================
-; SUMA_ARREGLO
+; TU FUNCION MIN_ EXACTAMENTE COMO LA PASASTE
 ;=========================================================
 
-;sumador
-;Creador Carlos Hurtado Villalobos
+;Carlos Hurtado
 
-;Entrada : BP=es el arreglo, AL=N
-;SALIDA TIENE QUE SER LA SUMA = AX
 
-Suma_arreglo PROC
+;ENTRADA BP=DIRECCION ARREGLO
+;AL=N
 
+;SALIDA AX=MINIMO
+
+
+Min_ PROC
     PUSH BX
     PUSH CX
     PUSH SI
     PUSH DX
 
-    MOV CL,AL
-    MOV CH,0
-
-    MOV AX,0
-    MOV DX,0
-    MOV SI,0
+    mov CL,AL ; GUARDAR EL N
+    XOR SI,SI ; HACERLO 0 QUE ES LO MISMO QUE USAR EL MOV,0
+    XOR CH,CH
 
     MOV BX,BP
-
-suma_bucle:
-
-    MOV AL,[BX+SI]
-    CBW
-
-    ADD DX,AX
+    MOV AL,[BX + SI] ; PRIMER ELEMENTO 
 
     ADD SI,1
-    LOOP suma_bucle
+    DEC CX  ; TIENE QUE IR DECRECIENDO
 
-    MOV AX,DX
+    min_bug: 
 
-    POP DX
-    POP SI
-    POP CX
-    POP BX
+        MOV DL, [BX + SI]
+        CMP DL,AL ;COMPARAR ELEMENTOS CON EL MINIMO ACTUAL
 
-    RET
+        JL nuevo_minimo   ; si DL< AL, nuevo minimo 
 
-Suma_arreglo ENDP
+    continuar:
+        add SI,1 ;avanzar 1 byte
+        loop min_bug
+
+        CBW   ; EXTERDER EL SIGNO. 
+
+        POP DX
+        POP SI
+        POP CX
+        POP BX
+        RET
+ 
+    nuevo_minimo:
+        mov AL,DL ; guardaer el nuevo minimo 
+        JMP continuar
+
+Min_ ENDP
 
 
 ;=========================================================
-; PRINT AX EN DECIMAL
+; IMPRIMIR AX CON SIGNO
 ;=========================================================
 
 PrintAX PROC
@@ -109,6 +116,22 @@ PrintAX PROC
     PUSH BX
     PUSH CX
     PUSH DX
+
+    ; Revisar si AX es negativo
+    CMP AX,0
+    JGE positivo
+
+    ; Imprimir "-"
+    PUSH AX
+    MOV DL,'-'
+    MOV AH,02h
+    INT 21h
+    POP AX
+
+    ; Convertir a positivo
+    NEG AX
+
+positivo:
 
     MOV BX,10
     MOV CX,0

@@ -22,6 +22,7 @@ Min_ PROC
 
     ADD SI,1
     DEC CX  ; TIENE QUE IR DECRECIENDO
+    
 
     min_bug: 
 
