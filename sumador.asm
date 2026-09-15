@@ -36,7 +36,7 @@ Suma_arreglo PROC
         add SI,1     ; debiera de avanzar 1bytes. 
         loop suma_bucle ; repetir mientas cx sea diferente de 0. 
 
-        mov AX,BX  ; pasar a la suma final de ax
+        mov AX,DX  ; pasar a la suma final de ax
 
     POP SI
     POP CX
