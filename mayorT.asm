@@ -22,3 +22,21 @@ Mayor_ PROC
     MOV BX,BP       ; BX TIENE LA DIRECCION DEL ARREGLO
 
     MOV AX,0        ; AX VA A CONTAR LOS MAYORES
+
+    bucle: 
+         
+         mov DH, [BX+SI] ; leer elemento 
+         CMP DH,DL ; comparar el elemento con T 
+         jg esmayor ; // el salto que tiene que dar si es mayo a la otra etiqueta; 
+
+
+
+
+    es mayor:
+            ADD AX,1 ; aumenta el contador 
+
+            jmp contunuar 
+
+
+
+
