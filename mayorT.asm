@@ -1,0 +1,24 @@
+;Carlos Hurtado
+
+;ENTRADA BP = DIRECCION ARREGLO
+;AL = N
+;DL = T
+
+;SALIDA AX = CANTIDAD MAYORES A T
+
+
+Mayor_ PROC
+
+    PUSH BX
+    PUSH CX
+    PUSH SI
+    PUSH DX
+
+    MOV CL,AL       ; GUARDAR N
+    MOV CH,0
+
+    MOV SI,0        ; INDICE = 0
+
+    MOV BX,BP       ; BX TIENE LA DIRECCION DEL ARREGLO
+
+    MOV AX,0        ; AX VA A CONTAR LOS MAYORES
