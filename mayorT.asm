@@ -29,13 +29,24 @@ Mayor_ PROC
          CMP DH,DL ; comparar el elemento con T 
          jg esmayor ; // el salto que tiene que dar si es mayo a la otra etiqueta; 
 
+    
+
+    continuar:
+        add SI,1 ; avanza 1  byte 
+        loop bucle
+        POP DX
+        POP SI
+        POP CX
+        POP BX
+
+        RET
 
 
-
-    es mayor:
+    esmayor:
             ADD AX,1 ; aumenta el contador 
 
-            jmp contunuar 
+            jmp continuar 
+Mayor_ ENDP
 
 
 
