@@ -27,7 +27,7 @@ Mayor_ PROC
          
          mov DH, [BX+SI] ; leer elemento 
          CMP DH,DL ; comparar el elemento con T 
-         jg esmayor ; // el salto que tiene que dar si es mayo a la otra etiqueta; 
+         jg esmayor ; // el salto que tiene que dar si es mayo a la otra etiqueta;  # aca 
 
     
 
