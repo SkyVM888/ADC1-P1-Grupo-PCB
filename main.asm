@@ -137,80 +137,90 @@ Suma_arreglo ENDP
 Max_arreglo PROC
     PUSH BX
     PUSH CX
-    PUSH SI
     PUSH DX
+    PUSH SI
 
-    mov CL,AL ; GUARDAR EL N
+    mov CX,AX ; GUARDAR EL N completo 
+    cmp CX,0   
+    JE max_cero   ; N==0 preguntar 
+
     XOR SI,SI ; HACERLO 0 QUE ES LO MISMO QUE USAR EL MOV,0
-    XOR CH,CH
+    MOV BX,BP   ; direc del array 
+    MOV AL,[BX + SI] ; PRIMER ELEMENTO  como minimo incial. 
 
-    MOV BX,BP
-    MOV AL,[BX + SI] ; PRIMER ELEMENTO 
-
-    ADD SI,1
-    DEC CX  ; TIENE QUE IR DECRECIENDO
-    
+    inc SI ; avanzar al siguiente elemento
+    dec CX  ; decrementar n tras procesar el elememento   
+    jz fin_max ; si n=1 no entrar al ciclo por que es un solo elemento
 
     max_bug: 
 
         MOV DL, [BX + SI]
-        CMP DL,AL ;COMPARAR ELEMENTOS CON EL MAXIMO ACTUAL
+        CMP DL,AL ;COMPARAR ELEMENTOS CON EL MINIMO ACTUAL
 
-        JG nuevo_maximo   ; SOOLO ES CAMBIAR ESTO POR QUE  DE JL A JG
+        jle nomayor   ; si DL mayor o igual a  AL, nuevo minimo ; aca cambiar el de maximo. ##
+        mov AL,DL  ; actualización 
 
-    max_continuar:
-        add SI,1 ;avanzar 1 byte
-        loop max_bug
+    nomayor:
+        inc SI
+        LOOP max_bug
+        JMP fin_max
 
+    max_cero:
+        mov AL,80h 
+   ;//////////////////////////////////////////////////////////////////////////
+    fin_max: ; aca; 
         CBW   ; EXTERDER EL SIGNO. 
 
-        POP DX
         POP SI
+        POP DX
         POP CX
         POP BX
         RET
- 
-    nuevo_maximo:
-        mov AL,DL ; guardaer el nuevo MAX
-        JMP max_continuar
 Max_arreglo ENDP
 
 Min_arreglo PROC
     PUSH BX
     PUSH CX
-    PUSH SI
     PUSH DX
+    PUSH SI
 
-    mov CL,AL ; GUARDAR EL N
+    mov CX,AX ; GUARDAR EL N completo 
+    cmp CX,0   
+    JE min_cero   ; N==0 preguntar 
+
     XOR SI,SI ; HACERLO 0 QUE ES LO MISMO QUE USAR EL MOV,0
-    XOR CH,CH
+    MOV BX,BP   ; direc del array 
+    MOV AL,[BX + SI] ; PRIMER ELEMENTO  como minimo incial. 
 
-    MOV BX,BP
-    MOV AL,[BX + SI] ; PRIMER ELEMENTO 
-
-    ADD SI,1
-    DEC CX  ; TIENE QUE IR DECRECIENDO
+    inc SI ; avanzar al siguiente elemento
+    dec CX  ; decrementar n tras procesar el elememento   
+    jz fin_min ; si n=1 no entrar al ciclo por que es un solo elemento
 
     min_bug: 
+
         MOV DL, [BX + SI]
         CMP DL,AL ;COMPARAR ELEMENTOS CON EL MINIMO ACTUAL
-        JL nuevo_minimo   ; si DL< AL, nuevo minimo 
 
-    min_continuar:
-        add SI,1 ;avanzar 1 byte
-        loop min_bug
+        jge nomenor   ; si DL mayor o igual a  AL, nuevo minimo ; aca cambiar el de maximo. ##
+        mov AL,DL  ; actualización 
 
+    nomenor:
+        inc SI
+        LOOP min_bug
+        JMP fin_min
+
+    min_cero:
+        mov AL,7Fh 
+   ;//////////////////////////////////////////////////////////////////////////
+    fin_min: ; aca; 
         CBW   ; EXTERDER EL SIGNO. 
 
-        POP DX
         POP SI
+        POP DX
         POP CX
         POP BX
         RET
- 
-    nuevo_minimo:
-        mov AL,DL ; guardaer el nuevo minimo 
-        JMP min_continuar
+
 Min_arreglo ENDP
 
 Mayor_T_arreglo PROC
