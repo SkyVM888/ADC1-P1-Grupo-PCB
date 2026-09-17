@@ -29,7 +29,7 @@ Min_ PROC
         MOV DL, [BX + SI]
         CMP DL,AL ;COMPARAR ELEMENTOS CON EL MINIMO ACTUAL
 
-        jge nuevo_minimo   ; si DL mayor o igual a  AL, nuevo minimo ; aca cambiar el de maximo. ##
+        jge nomenor   ; si DL mayor o igual a  AL, nuevo minimo ; aca cambiar el de maximo. ##
         mov AL,DL  ; actualización 
 
     nomenor:
