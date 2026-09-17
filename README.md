@@ -7,7 +7,7 @@ Repositorio oficial para el curso de Arquitectura de Computadoras (GR20).
 | Nombre Completo | Carné | Usuario de GitHub |
 | :--- | :---: | :---: |
 | **Luis Pablo Vargas Muñoz** | `2021490483` | [@SkyVM888](https://github.com/SkyVM888) |
-| **Carlos** | `2021490483` | [@Charlespixel](https://github.com/Charlespixel) |
+| **Carlos Daniel Hurtado Villalobos** | `2021-------` | [@Charlespixel](https://github.com/Charlespixel) |
 | **Brayan Ariel Vargas Rojas** | `2021028522` | [@BrayanVR21](https://github.com/BrayanVR21) |
 
 ## 📌 Descripción del Proyecto
@@ -18,4 +18,4 @@ Repositorio oficial para el curso de Arquitectura de Computadoras (GR20).
 
 * **Ensamblador:** x86 (TASM - Turbo Assembler)
 * **Entorno de Ejecución:** DOSBox
-* **Control de Versiones:** Git / GitHub
+* **Control de Versiones:** GitHub
