@@ -45,6 +45,17 @@
     ; Contador Conteo_C (Muestras > T): 16 bits sin signo
     Conteo_C    DW Cantidad dup (?)
 
+    ; //// Mensajes de impresión ////
+
+    msg_N           DB  'N = $'
+    msg_T           DB  'T = $'
+    msg_minimo      DB  'Minimo = $'
+    msg_maximo      DB  'Maximo = $'
+    msg_suma        DB  'Suma = $'
+    msg_conteo      DB  'Mayores que T = $'
+    
+    salto_linea     DB  13, 10, '$'
+
 ;========================================================================
 .code
 
@@ -55,6 +66,9 @@ main proc
     ; Inicio del Loop Principal
     mov BX, OFFSET Matriz   ; <---------Asignar Matriz de arreglos
     call Main_loop
+
+    ; Imprimir resultados
+    call Print_results
 
     call endprogram
 main endp
@@ -82,6 +96,154 @@ print proc
     int 21h
     ret
 print endp
+
+; Funcion de imprimir numero
+Print_num proc
+
+    PUSH AX
+    PUSH BX
+    PUSH CX
+    PUSH DX
+
+    ; Verificar si el número es negativo
+    CMP AX, 0
+    JGE numero_positivo
+
+    ; Imprimir signo negativo
+    PUSH AX
+    MOV DL, '-'
+    MOV AH, 02h
+    INT 21h
+    POP AX
+
+    ; Convertir el número a positivo
+    NEG AX
+
+numero_positivo:
+
+    ; Caso especial: AX = 0
+    CMP AX, 0
+    JNE convertir
+
+    MOV DL, '0'
+    MOV AH, 02h
+    INT 21h
+    JMP fin_num
+
+convertir:
+
+    XOR CX, CX
+    MOV BX, 10
+
+dividir:
+
+    XOR DX, DX
+    DIV BX
+
+    PUSH DX
+    INC CX
+
+    CMP AX, 0
+    JNE dividir
+
+imprimir_digitos:
+
+    POP DX
+    ADD DL, '0'
+
+    MOV AH, 02h
+    INT 21h
+
+    LOOP imprimir_digitos
+
+fin_num:
+
+    POP DX
+    POP CX
+    POP BX
+    POP AX
+
+    RET
+
+Print_num endp
+
+; Imprimir resultados
+Print_results proc
+
+    ; N
+    MOV DX, OFFSET msg_N
+    CALL print
+
+    MOV AX, N
+    CALL Print_num
+
+    MOV DX, OFFSET salto_linea
+    CALL print
+
+
+    ; T
+    MOV DX, OFFSET msg_T
+    CALL print
+
+    XOR AX, AX
+    MOV AL, T
+    CBW
+    CALL Print_num
+
+    MOV DX, OFFSET salto_linea
+    CALL print
+
+
+    ; Minimo
+    MOV DX, OFFSET msg_minimo
+    CALL print
+
+    XOR AX, AX
+    MOV AL, minimo
+    CBW
+    CALL Print_num
+
+    MOV DX, OFFSET salto_linea
+    CALL print
+
+
+    ; Maximo
+    MOV DX, OFFSET msg_maximo
+    CALL print
+
+    XOR AX, AX
+    MOV AL, maximo
+    CBW
+    CALL Print_num
+
+    MOV DX, OFFSET salto_linea
+    CALL print
+
+
+    ; Suma
+    MOV DX, OFFSET msg_suma
+    CALL print
+
+    MOV AX, suma
+    CALL Print_num
+
+    MOV DX, OFFSET salto_linea
+    CALL print
+
+
+    ; Conteo
+    MOV DX, OFFSET msg_conteo
+    CALL print
+
+    MOV AX, Conteo_C
+    CALL Print_num
+
+    MOV DX, OFFSET salto_linea
+    CALL print
+
+    RET
+
+Print_results endp
 
 ; Cierre de Programa
 endprogram proc
