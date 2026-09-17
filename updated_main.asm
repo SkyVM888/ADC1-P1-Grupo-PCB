@@ -54,7 +54,7 @@
     msg_maximo      DB  'Maximo = $'
     msg_suma        DB  'Suma = $'
     msg_conteo      DB  'Mayores que T = $'
-    
+    msg_error       DB  'ERROR POR VALOR DE N$'
     salto_linea     DB  13, 10, '$'
 
 ;========================================================================
@@ -238,14 +238,23 @@ imprimir_arreglo:
     MOV DX, OFFSET msg_minimo
     CALL print
 
+    CMP Conteo_C[SI], 0FFFFh
+    JE error_minimo
+
     XOR AX, AX
     MOV AL, minimo[DI]
     CBW
     CALL Print_num
+    JMP fin_minimo
+
+    error_minimo:
+        MOV DX, OFFSET msg_error
+        CALL print
+
+    fin_minimo:
 
     MOV DX, OFFSET salto_linea
     CALL print
-
 
     ; -----------------------------------------
     ; Maximo
@@ -254,10 +263,20 @@ imprimir_arreglo:
     MOV DX, OFFSET msg_maximo
     CALL print
 
+    CMP Conteo_C[SI], 0FFFFh
+    JE error_maximo
+
     XOR AX, AX
     MOV AL, maximo[DI]
     CBW
     CALL Print_num
+    JMP fin_maximo
+
+    error_maximo:
+        MOV DX, OFFSET msg_error
+        CALL print
+
+    fin_maximo:
 
     MOV DX, OFFSET salto_linea
     CALL print
@@ -270,12 +289,21 @@ imprimir_arreglo:
     MOV DX, OFFSET msg_suma
     CALL print
 
+    CMP Conteo_C[SI], 0FFFFh
+    JE error_suma
+
     MOV AX, suma[SI]
     CALL Print_num
+    JMP fin_suma
+
+    error_suma:
+        MOV DX, OFFSET msg_error
+        CALL print
+
+    fin_suma:
 
     MOV DX, OFFSET salto_linea
     CALL print
-
 
     ; -----------------------------------------
     ; Conteo mayor que T
@@ -284,8 +312,18 @@ imprimir_arreglo:
     MOV DX, OFFSET msg_conteo
     CALL print
 
+    CMP Conteo_C[SI], 0FFFFh
+    JE error_conteo
+
     MOV AX, Conteo_C[SI]
     CALL Print_num
+    JMP fin_conteo
+
+    error_conteo:
+        MOV DX, OFFSET msg_error
+        CALL print
+
+    fin_conteo:
 
     MOV DX, OFFSET salto_linea
     CALL print
