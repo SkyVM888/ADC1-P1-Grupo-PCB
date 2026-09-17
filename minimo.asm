@@ -22,6 +22,8 @@ Min_ PROC
 
     ADD SI,1
     DEC CX  ; TIENE QUE IR DECRECIENDO
+
+    jz fin_min ; si n=1 no entrar al ciclo por que es un solo elemento
     
 
     min_bug: 
@@ -35,6 +37,7 @@ Min_ PROC
         add SI,1 ;avanzar 1 byte
         loop min_bug
 
+    fin_min: 
         CBW   ; EXTERDER EL SIGNO. 
 
         POP DX
