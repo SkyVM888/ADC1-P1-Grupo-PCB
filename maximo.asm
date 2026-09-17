@@ -4,48 +4,50 @@
 ;ENTRADA BP=DIRECCION ARREGLO
 ;AL=N
 
-;SALIDA AX=maximo
+;SALIDA AX=Maximo 
 
-
-Max_ PROC
+max_ PROC
     PUSH BX
     PUSH CX
-    PUSH SI
     PUSH DX
+    PUSH SI
 
-    mov CL,AL ; GUARDAR EL N
+    mov CX,AX ; GUARDAR EL N completo 
+    cmp CX,0   
+    JE max_cero   ; N==0 preguntar 
+
     XOR SI,SI ; HACERLO 0 QUE ES LO MISMO QUE USAR EL MOV,0
-    XOR CH,CH
+    MOV BX,BP   ; direc del array 
+    MOV AL,[BX + SI] ; PRIMER ELEMENTO  como minimo incial. 
 
-    MOV BX,BP
-    MOV AL,[BX + SI] ; PRIMER ELEMENTO 
-
-    ADD SI,1
-    DEC CX  ; TIENE QUE IR DECRECIENDO
-    
+    inc SI ; avanzar al siguiente elemento
+    dec CX  ; decrementar n tras procesar el elememento   
+    jz fin_max ; si n=1 no entrar al ciclo por que es un solo elemento
 
     max_bug: 
 
         MOV DL, [BX + SI]
-        CMP DL,AL ;COMPARAR ELEMENTOS CON EL MAXIMO ACTUAL
+        CMP DL,AL ;COMPARAR ELEMENTOS CON EL MINIMO ACTUAL
 
-        JG nuevo_maximo   ; SOOLO ES CAMBIAR ESTO POR QUE  DE JL A JG
+        jle nomayor   ; si DL mayor o igual a  AL, nuevo minimo ; aca cambiar el de maximo. ##
+        mov AL,DL  ; actualización 
 
-    continuar:
-        add SI,1 ;avanzar 1 byte
-        loop max_bug
+    nomayor:
+        inc SI
+        LOOP max_bug
+        JMP fin_max
 
+    max_cero:
+        mov AL,80h 
+   ;//////////////////////////////////////////////////////////////////////////
+    fin_max: ; aca; 
         CBW   ; EXTERDER EL SIGNO. 
 
-        POP DX
         POP SI
+        POP DX
         POP CX
         POP BX
         RET
  
-    nuevo_maximo:
-        mov AL,DL ; guardaer el nuevo MAX
-        JMP continuar
-
-Max_ ENDP 
+max_ ENDP 
 
