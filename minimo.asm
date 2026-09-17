@@ -6,49 +6,48 @@
 
 ;SALIDA AX=MINIMO
 
-
 Min_ PROC
     PUSH BX
     PUSH CX
-    PUSH SI
     PUSH DX
+    PUSH SI
 
-    mov CL,AL ; GUARDAR EL N
+    mov CX,AX ; GUARDAR EL N completo 
+    cmp CX,0   
+    JE min_cero   ; N==0 preguntar 
+
     XOR SI,SI ; HACERLO 0 QUE ES LO MISMO QUE USAR EL MOV,0
-    XOR CH,CH
+    MOV BX,BP   ; direc del array 
+    MOV AL,[BX + SI] ; PRIMER ELEMENTO  como minimo incial. 
 
-    MOV BX,BP
-    MOV AL,[BX + SI] ; PRIMER ELEMENTO 
-
-    ADD SI,1
-    DEC CX  ; TIENE QUE IR DECRECIENDO
-
+    inc SI ; avanzar al siguiente elemento
+    dec CX  ; decrementar n tras procesar el elememento   
     jz fin_min ; si n=1 no entrar al ciclo por que es un solo elemento
-    
 
     min_bug: 
 
         MOV DL, [BX + SI]
         CMP DL,AL ;COMPARAR ELEMENTOS CON EL MINIMO ACTUAL
 
-        JL nuevo_minimo   ; si DL< AL, nuevo minimo 
+        jge nomenor   ; si DL mayor o igual a  AL, nuevo minimo ; aca cambiar el de maximo. ##
+        mov AL,DL  ; actualización 
 
-    continuar:
-        add SI,1 ;avanzar 1 byte
-        loop min_bug
+    nomenor:
+        inc SI
+        LOOP min_bug
+        JMP fin_min
 
-    fin_min: 
+    min_cero:
+        mov AL,7Fh 
+   ;//////////////////////////////////////////////////////////////////////////
+    fin_min: ; aca; 
         CBW   ; EXTERDER EL SIGNO. 
 
-        POP DX
         POP SI
+        POP DX
         POP CX
         POP BX
         RET
  
-    nuevo_minimo:
-        mov AL,DL ; guardaer el nuevo minimo 
-        JMP continuar
-
 Min_ ENDP 
 
