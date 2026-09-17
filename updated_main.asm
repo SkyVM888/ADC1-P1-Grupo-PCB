@@ -179,7 +179,7 @@ Print_results PROC
     PUSH DI
 
     XOR DI, DI                  ; DI = índice de arreglo
-    MOV CX, 3            ; CX = 6 arreglos
+    MOV CX, Cantidad            ; CX = 6 arreglos
 
 imprimir_arreglo:
 
