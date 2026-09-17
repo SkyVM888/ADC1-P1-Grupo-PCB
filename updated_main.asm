@@ -16,7 +16,7 @@
     ; Datos de los arreglos
     N           DW  8, 1, 4, 4, 64, 64            ; Dimensiones de 16 bits (DW)
     T           DB  5, -7, -5, 5, 126, -128       ; Umbrales de 8 bits con signo (DB)
-    Cantidad    EQU  6                             ; Cantidad de arreglos a evaluar
+    Cantidad    EQU  6                            ; Cantidad de arreglos a evaluar
 
     ; Arreglos definidos
     arreglo1    DB  -12, 0, 18, -5, 127, -128, 18, 5
@@ -47,6 +47,7 @@
 
     ; //// Mensajes de impresión ////
 
+    msg_arreglo     DB  'Arreglo $'
     msg_N           DB  'N = $'
     msg_T           DB  'T = $'
     msg_minimo      DB  'Minimo = $'
@@ -119,45 +120,194 @@ Print_num proc
     ; Convertir el número a positivo
     NEG AX
 
-numero_positivo:
+    numero_positivo:
 
-    ; Caso especial: AX = 0
-    CMP AX, 0
-    JNE convertir
+        ; Caso especial: AX = 0
+        CMP AX, 0
+        JNE convertir
 
-    MOV DL, '0'
-    MOV AH, 02h
-    INT 21h
-    JMP fin_num
+        MOV DL, '0'
+        MOV AH, 02h
+        INT 21h
+        JMP fin_num
 
-convertir:
+    convertir:
 
-    XOR CX, CX
-    MOV BX, 10
+        XOR CX, CX
+        MOV BX, 10
 
-dividir:
+    dividir:
 
-    XOR DX, DX
-    DIV BX
+        XOR DX, DX
+        DIV BX
 
+        PUSH DX
+        INC CX
+
+        CMP AX, 0
+        JNE dividir
+
+    imprimir_digitos:
+
+        POP DX
+        ADD DL, '0'
+
+        MOV AH, 02h
+        INT 21h
+
+        LOOP imprimir_digitos
+
+    fin_num:
+
+        POP DX
+        POP CX
+        POP BX
+        POP AX
+
+        ret
+
+Print_num endp
+
+; Imprimir resultados
+Print_results PROC
+
+    PUSH AX
+    PUSH BX
+    PUSH CX
     PUSH DX
-    INC CX
+    PUSH SI
+    PUSH DI
 
-    CMP AX, 0
-    JNE dividir
+    XOR DI, DI                  ; DI = índice de arreglo
+    MOV CX, 3            ; CX = 6 arreglos
 
-imprimir_digitos:
+imprimir_arreglo:
 
-    POP DX
-    ADD DL, '0'
+    ; -----------------------------------------
+    ; Imprimir "Arreglo X"
+    ; -----------------------------------------
 
-    MOV AH, 02h
-    INT 21h
+    MOV DX, OFFSET msg_arreglo
+    CALL print
 
-    LOOP imprimir_digitos
+    MOV AX, DI
+    INC AX                      ; Convertir índice 0-5 a número 1-6
+    CALL Print_num
 
-fin_num:
+    MOV DX, OFFSET salto_linea
+    CALL print
 
+
+    ; -----------------------------------------
+    ; N
+    ; -----------------------------------------
+
+    MOV DX, OFFSET msg_N
+    CALL print
+
+    MOV SI, DI
+    SHL SI, 1                   ; SI = DI * 2
+
+    MOV AX, N[SI]
+    CALL Print_num
+
+    MOV DX, OFFSET salto_linea
+    CALL print
+
+
+    ; -----------------------------------------
+    ; T
+    ; -----------------------------------------
+
+    MOV DX, OFFSET msg_T
+    CALL print
+
+    XOR AX, AX
+    MOV AL, T[DI]
+    CBW
+    CALL Print_num
+
+    MOV DX, OFFSET salto_linea
+    CALL print
+
+
+    ; -----------------------------------------
+    ; Minimo
+    ; -----------------------------------------
+
+    MOV DX, OFFSET msg_minimo
+    CALL print
+
+    XOR AX, AX
+    MOV AL, minimo[DI]
+    CBW
+    CALL Print_num
+
+    MOV DX, OFFSET salto_linea
+    CALL print
+
+
+    ; -----------------------------------------
+    ; Maximo
+    ; -----------------------------------------
+
+    MOV DX, OFFSET msg_maximo
+    CALL print
+
+    XOR AX, AX
+    MOV AL, maximo[DI]
+    CBW
+    CALL Print_num
+
+    MOV DX, OFFSET salto_linea
+    CALL print
+
+
+    ; -----------------------------------------
+    ; Suma
+    ; -----------------------------------------
+
+    MOV DX, OFFSET msg_suma
+    CALL print
+
+    MOV AX, suma[SI]
+    CALL Print_num
+
+    MOV DX, OFFSET salto_linea
+    CALL print
+
+
+    ; -----------------------------------------
+    ; Conteo mayor que T
+    ; -----------------------------------------
+
+    MOV DX, OFFSET msg_conteo
+    CALL print
+
+    MOV AX, Conteo_C[SI]
+    CALL Print_num
+
+    MOV DX, OFFSET salto_linea
+    CALL print
+
+    ; Línea en blanco entre arreglos
+    MOV DX, OFFSET salto_linea
+    CALL print
+
+
+    ; -----------------------------------------
+    ; Siguiente arreglo
+    ; -----------------------------------------
+
+    INC DI
+    DEC CX
+    JZ fin_print_results
+    JMP imprimir_arreglo
+
+fin_print_results:
+
+    POP DI
+    POP SI
     POP DX
     POP CX
     POP BX
@@ -165,85 +315,7 @@ fin_num:
 
     RET
 
-Print_num endp
-
-; Imprimir resultados
-Print_results proc
-
-    ; N
-    MOV DX, OFFSET msg_N
-    CALL print
-
-    MOV AX, N
-    CALL Print_num
-
-    MOV DX, OFFSET salto_linea
-    CALL print
-
-
-    ; T
-    MOV DX, OFFSET msg_T
-    CALL print
-
-    XOR AX, AX
-    MOV AL, T
-    CBW
-    CALL Print_num
-
-    MOV DX, OFFSET salto_linea
-    CALL print
-
-
-    ; Minimo
-    MOV DX, OFFSET msg_minimo
-    CALL print
-
-    XOR AX, AX
-    MOV AL, minimo
-    CBW
-    CALL Print_num
-
-    MOV DX, OFFSET salto_linea
-    CALL print
-
-
-    ; Maximo
-    MOV DX, OFFSET msg_maximo
-    CALL print
-
-    XOR AX, AX
-    MOV AL, maximo
-    CBW
-    CALL Print_num
-
-    MOV DX, OFFSET salto_linea
-    CALL print
-
-
-    ; Suma
-    MOV DX, OFFSET msg_suma
-    CALL print
-
-    MOV AX, suma
-    CALL Print_num
-
-    MOV DX, OFFSET salto_linea
-    CALL print
-
-
-    ; Conteo
-    MOV DX, OFFSET msg_conteo
-    CALL print
-
-    MOV AX, Conteo_C
-    CALL Print_num
-
-    MOV DX, OFFSET salto_linea
-    CALL print
-
-    RET
-
-Print_results endp
+Print_results ENDP
 
 ; Cierre de Programa
 endprogram proc
