@@ -102,4 +102,4 @@ Al ejecutar el programa, se mostrarán en pantalla las siguientes métricas calc
 - Suma: Suma total de los elementos.
 - Mayores que T: Cantidad de elementos estrictamente mayores al umbral $T$.
 
-En caso de no cumplir con la condición $1 \le N \le 64$, el arreglo correspondiente a dicho N no será evaluado y se indica `ERROR POR VALOR DE N`
+En caso de no cumplir con la condición $1 \le N \le 64$, el arreglo correspondiente a dicho N no será evaluado y se indica `ERROR`
