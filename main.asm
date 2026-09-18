@@ -14,9 +14,9 @@
 ;========================================================================
 .data
     ; Datos de los arreglos
-    N           DW  8, 1, 4, 4, 64, 64, 0, 65            ; Dimensiones de 16 bits (DW)
-    T           DB  5, -7, -5, 5, 126, -128, 1, 1       ; Umbrales de 8 bits con signo (DB)
-    Cantidad    EQU  8                            ; Cantidad de arreglos a evaluar
+    N           DW  8, 1, 4, 4, 64, 64, 0, 65       ; Dimensiones de 16 bits (DW)
+    T           DB  5, -7, -5, 5, 126, -128, 1, 1   ; Umbrales de 8 bits con signo (DB)
+    Cantidad    EQU  8                              ; Cantidad de arreglos a evaluar
 
     ; Arreglos definidos
     arreglo1    DB  -12, 0, 18, -5, 127, -128, 18, 5
@@ -65,16 +65,16 @@
 ;========================================================================
 .code
 
-main proc
+main PROC
     ; Inicio de programa
-    call start
+    CALL start
 
     ; Inicio del Loop Principal
-    mov BX, OFFSET Matriz   ; <---------Asignar Matriz de arreglos
-    call Main_loop
+    MOV BX, OFFSET Matriz   ; <---------Asignar Matriz de arreglos
+    CALL Main_loop
 
     ; Imprimir resultados
-    call Print_results
+    CALL Print_results
 
     ; Imprimir 2 saltos de línea para empujar el cursos hacia abajo
     MOV DX, OFFSET salto_linea
@@ -82,109 +82,115 @@ main proc
     MOV DX, OFFSET salto_linea
     CALL print
 
-    call endprogram
-main endp
+    CALL endprogram
+main ENDP
 
 ;========================================================================
 ;                   Funciones de uso general
 ;========================================================================
+
 ; Funcion de inicio
-start proc
+start PROC
     ; Inicializacion
-    mov AX, @data
-    mov DS, AX
+    MOV AX, @data
+    MOV DS, AX
 
     ;limpiar pantalla
-    mov AH,00h
-    mov AL,03h
-    int 10h
+    MOV AH,00h
+    MOV AL,03h
+    INT 10h
     
     ret
-start endp
+start ENDP
 
-; Funcion de imprimir
-print proc
-    mov AH, 09h
-    int 21h
+; Funcion de imprimir una cadena completa de texto terminada en $
+print PROC
+    MOV AH, 09h
+    INT 21h
     ret
-print endp
+print ENDP
+
+; Funcion de imprimir un solo caracter
+print_char PROC
+    MOV AH, 02h
+    INT 21h
+    ret
+print_char ENDP
 
 ; Funcion de imprimir TAB
-print_tab proc
-    mov DL, 09h
-    mov AH, 02h
-    int 21h
+print_tab PROC
+    MOV DL, 09h
+    MOV AH, 02h
+    INT 21h
     ret
-print_tab endp
+print_tab ENDP
 
-; Funcion de imprimir texto seguido de TAB
-print_tabla proc
+; Funcion de imprimir texto + TAB
+print_tabla PROC
     CALL print
     CALL print_tab
     ret
-print_tabla endp
+print_tabla ENDP
 
 ; Funcion de imprimir numero
-Print_num proc
+Print_num PROC
 
+    ; Preservar el estado de los registros en la pila
     PUSH AX
     PUSH BX
     PUSH CX
     PUSH DX
 
     ; Verificar si el número es negativo
-    CMP AX, 0
-    JGE numero_positivo
+    CMP AX, 0               ; Comparar el valor en AX con 0
+    JGE numero_positivo     ; Salta si es mayor o igual a 0 (positivo)
 
     ; Imprimir signo negativo
-    PUSH AX
-    MOV DL, '-'
-    MOV AH, 02h
-    INT 21h
-    POP AX
+    PUSH AX                 ; Guardar temporalmente AX mientras se imprime el signo
+    MOV DL, '-'             ; Carácter '-' para la salida
+    CALL print_char
+    POP AX                  ; Restaurar el valor original de AX
 
     ; Convertir el número a positivo
-    NEG AX
+    NEG AX                  ; Convertir el número a positivo (Complemento a 2)
 
     numero_positivo:
 
         ; Caso especial: AX = 0
         CMP AX, 0
-        JNE convertir
+        JNE convertir       ; Si AX != 0, proceder con la división
 
-        MOV DL, '0'
-        MOV AH, 02h
-        INT 21h
-        JMP fin_num
+        MOV DL, '0'         ; Imprimir directamente el carácter '0'
+        CALL print_char
+        JMP fin_num         ; Salir de la función
 
     convertir:
 
-        XOR CX, CX
-        MOV BX, 10
+        XOR CX, CX          ; CX = 0 (Contador para llevar la cantidad de dígitos)
+        MOV BX, 10          ; BX = 10 (Divisor para extraer dígitos en base 10)
 
     dividir:
 
-        XOR DX, DX
-        DIV BX
+        XOR DX, DX          ; Limpiar DX
+        DIV BX              ; División DX = AX / BX -> Cociente queda en AX, Residuo en DX
+                            ; El residuo (DX) representa el dígito actual (0-9)
 
-        PUSH DX
-        INC CX
+        PUSH DX             ; Guardar el dígito en la pila (para invertir el orden al imprimir)
+        INC CX              ; Incrementar el contador de dígitos en CX
 
-        CMP AX, 0
-        JNE dividir
+        CMP AX, 0           ; Verifica si quedan más dígitos
+        JNE dividir         ; Si AX != 0, continuar dividiendo
 
     imprimir_digitos:
 
-        POP DX
-        ADD DL, '0'
-
-        MOV AH, 02h
-        INT 21h
-
-        LOOP imprimir_digitos
+        POP DX                  ; Obtener el dígito almacenado más reciente
+        ADD DL, '0'             ; Convertir el valor numérico a su equivalente en ASCII (DL + 48)
+        CALL print_char
+        LOOP imprimir_digitos   ; Decrementar CX e iterar hasta imprimir todos los dígitos
 
     fin_num:
 
+        ; Restaurar el estado previo de los registros
         POP DX
         POP CX
         POP BX
@@ -192,11 +198,12 @@ Print_num proc
 
         ret
 
-Print_num endp
+Print_num ENDP
 
 ; Imprimir resultados en formato de tabla
 Print_results PROC
 
+    ; Preservar el contexto de los registros en la pila
     PUSH AX
     PUSH BX
     PUSH CX
@@ -207,9 +214,7 @@ Print_results PROC
     XOR DI, DI                  ; DI = índice de arreglo
     MOV CX, Cantidad            ; CX = cantidad de arreglos
 
-    ; =========================================================
-    ; Encabezado de la tabla
-    ; =========================================================
+    ; ============================= Encabezado de la tabla =============================
 
     MOV DX, OFFSET msg_arreglo
     CALL print_tabla
@@ -239,31 +244,28 @@ Print_results PROC
     MOV DX, OFFSET linea_tabla
     CALL print
 
+    ; ============================= Imprimir filas =============================
 
-    ; =========================================================
-    ; Imprimir filas
-    ; =========================================================
-
-imprimir_arreglo:
+    imprimir_arreglo:
 
     ; -----------------------------------------
     ; Arreglo
     ; -----------------------------------------
 
-    MOV AX, DI
-    INC AX
+    MOV AX, DI          ; Cargamos el índice del arreglo en AX
+    INC AX              ; Incrementamos para que la numeración comience desde 1
     CALL Print_num
     CALL print_tab
-    CALL print_tab
+    CALL print_tab      ; Doble TAB para mantener la alineación
 
     ; -----------------------------------------
     ; N
     ; -----------------------------------------
 
     MOV SI, DI
-    SHL SI, 1
+    SHL SI, 1           ; SI = DI * 2 (Calcula el offset para arreglos DW)
 
-    MOV AX, N[SI]
+    MOV AX, N[SI]       ; Cargar dimensión N correspondiente
     CALL Print_num
     CALL print_tab
 
@@ -272,8 +274,8 @@ imprimir_arreglo:
     ; -----------------------------------------
 
     XOR AX, AX
-    MOV AL, T[DI]
-    CBW
+    MOV AL, T[DI]       ; Cargar umbral de 8 bits
+    CBW                 ; Extender el signo de AL a AX para su correcta impresión
     CALL Print_num
     CALL print_tab
 
@@ -281,8 +283,8 @@ imprimir_arreglo:
     ; Verificar si el arreglo es inválido
     ; -----------------------------------------
 
-    CMP Conteo_C[SI], 0FFFFh
-    JE imprimir_error
+    CMP Conteo_C[SI], 0FFFFh    ; Evaluar si el contador almacena la bandera de error (-1)
+    JE imprimir_error           ; Si es inválido, saltar a la sección de impresión de "ERROR"
 
     ; -----------------------------------------
     ; Minimo
@@ -290,7 +292,7 @@ imprimir_arreglo:
 
     XOR AX, AX
     MOV AL, minimo[DI]
-    CBW
+    CBW                         ; Extensión de signo de AL a AX
     CALL Print_num
     CALL print_tab
 
@@ -300,7 +302,7 @@ imprimir_arreglo:
 
     XOR AX, AX
     MOV AL, maximo[DI]
-    CBW
+    CBW                         ; Extensión de signo de AL a AX
     CALL Print_num
     CALL print_tab
 
@@ -308,7 +310,7 @@ imprimir_arreglo:
     ; Suma
     ; -----------------------------------------
 
-    MOV AX, suma[SI]
+    MOV AX, suma[SI]            ; Cargar resultado de suma de 16 bits
     CALL Print_num
     CALL print_tab
 
@@ -316,17 +318,16 @@ imprimir_arreglo:
     ; Conteo_C
     ; -----------------------------------------
 
-    MOV AX, Conteo_C[SI]
+    MOV AX, Conteo_C[SI]        ; Cargar la cantidad de elementos mayores a T
     CALL Print_num
 
-    JMP siguiente_arreglo
+    JMP siguiente_arreglo       ; Continuar con la siguiente fila
 
-
-    ; =========================================================
+    ; -----------------------------------------
     ; Caso de error
-    ; =========================================================
+    ; -----------------------------------------
 
-imprimir_error:
+    imprimir_error:             ; Imprime "ERROR" en las columnas de Min, Max, Suma y Conteo_C
 
     ; Minimo
     MOV DX, OFFSET msg_error
@@ -347,25 +348,28 @@ imprimir_error:
     MOV DX, OFFSET msg_error
     CALL print
 
-
-    ; =========================================================
+    ; -----------------------------------------
     ; Siguiente arreglo
-    ; =========================================================
+    ; -----------------------------------------
 
-siguiente_arreglo:
+    siguiente_arreglo:
 
     MOV DX, OFFSET salto_linea
     CALL print
 
-    INC DI
-    DEC CX
-    JZ fin_print_results
+    INC DI                      ; Avanzar al siguiente índice de arreglo
+    DEC CX                      ; Decrementar el contador de control de filas
+    JZ fin_print_results        ; Si CX = 0, se procesaron todos los arreglos
 
     JMP imprimir_arreglo
 
+    ; -----------------------------------------
+    ; Final de resultados
+    ; -----------------------------------------
 
-fin_print_results:
+    fin_print_results:
 
+    ; Restaurar todos los registros previamente salvaguardados
     POP DI
     POP SI
     POP DX
@@ -373,16 +377,16 @@ fin_print_results:
     POP BX
     POP AX
 
-    RET
+    ret
 
 Print_results ENDP
 
 ; Cierre de Programa
-endprogram proc
-    mov AH, 4Ch
-    int 21h
+endprogram PROC
+    MOV AH, 4Ch
+    INT 21h
     ret
-endprogram endp
+endprogram ENDP
 
 ;========================================================================
 ;               Funciones de calculos de arreglo
@@ -398,33 +402,33 @@ Suma_arreglo PROC
 
 ;---------------------------------------------------------------------------------------------------------------------------
 
-    mov CL,AL  ; Copiar el valor de N a CL  CL=N
-    mov CH,0   ; poner el 0 la parte alta 
+    MOV CL,AL  ; Copiar el valor de N a CL  CL=N
+    MOV CH,0   ; poner el 0 la parte alta 
     
-    mov AX,0  
-    mov DX,0 
-    mov SI,0  ;SI=0 INDICE
+    MOV AX,0  
+    MOV DX,0 
+    MOV SI,0  ;SI=0 INDICE
     
     MOV BX,BP     ;BX tiene la direccion del arreglo 
 ;------------------------------------------------------Parte del bulce------------------------------------------------------
 
     suma_bucle:
 
-        mov AL,[BX+SI] ;leer el elemento del arreglo
+        MOV AL,[BX+SI] ;leer el elemento del arreglo
         CBW   ; convertir al con signo a AX
 
-        add DX,AX  
+        ADD DX,AX  
 
-        add SI,1     ; debiera de avanzar 1bytes. 
-        loop suma_bucle ; repetir mientas cx sea diferente de 0. 
+        ADD SI,1     ; debiera de avanzar 1bytes. 
+        LOOP suma_bucle ; repetir mientas cx sea diferente de 0. 
 
-        mov AX,DX  ; pasar a la suma final de ax
+        MOV AX,DX  ; pasar a la suma final de ax
 
         POP DX
         POP SI
         POP CX
         POP BX
-        RET
+        ret
 
 Suma_arreglo ENDP
 
@@ -434,33 +438,33 @@ Max_arreglo PROC
     PUSH DX
     PUSH SI
 
-    mov CX,AX ; GUARDAR EL N completo 
-    cmp CX,0   
+    MOV CX,AX ; GUARDAR EL N completo 
+    CMP CX,0   
     JE max_cero   ; N==0 preguntar 
 
     XOR SI,SI ; HACERLO 0 QUE ES LO MISMO QUE USAR EL MOV,0
     MOV BX,BP   ; direc del array 
     MOV AL,[BX + SI] ; PRIMER ELEMENTO  como minimo incial. 
 
-    inc SI ; avanzar al siguiente elemento
-    dec CX  ; decrementar n tras procesar el elememento   
-    jz fin_max ; si n=1 no entrar al ciclo por que es un solo elemento
+    INC SI ; avanzar al siguiente elemento
+    DEC CX  ; decrementar n tras procesar el elememento   
+    JZ fin_max ; si n=1 no entrar al ciclo por que es un solo elemento
 
     max_bug: 
 
         MOV DL, [BX + SI]
         CMP DL,AL ;COMPARAR ELEMENTOS CON EL MINIMO ACTUAL
 
-        jle nomayor   ; si DL mayor o igual a  AL, nuevo minimo ; aca cambiar el de maximo. ##
-        mov AL,DL  ; actualización 
+        JLE nomayor   ; si DL mayor o igual a  AL, nuevo minimo ; aca cambiar el de maximo. ##
+        MOV AL,DL  ; actualización 
 
     nomayor:
-        inc SI
+        INC SI
         LOOP max_bug
         JMP fin_max
 
     max_cero:
-        mov AL,80h 
+        MOV AL,80h 
    ;//////////////////////////////////////////////////////////////////////////
     fin_max: ; aca; 
         CBW   ; EXTERDER EL SIGNO. 
@@ -469,7 +473,7 @@ Max_arreglo PROC
         POP DX
         POP CX
         POP BX
-        RET
+        ret
 Max_arreglo ENDP
 
 Min_arreglo PROC
@@ -478,33 +482,33 @@ Min_arreglo PROC
     PUSH DX
     PUSH SI
 
-    mov CX,AX ; GUARDAR EL N completo 
-    cmp CX,0   
+    MOV CX,AX ; GUARDAR EL N completo 
+    CMP CX,0   
     JE min_cero   ; N==0 preguntar 
 
     XOR SI,SI ; HACERLO 0 QUE ES LO MISMO QUE USAR EL MOV,0
     MOV BX,BP   ; direc del array 
     MOV AL,[BX + SI] ; PRIMER ELEMENTO  como minimo incial. 
 
-    inc SI ; avanzar al siguiente elemento
-    dec CX  ; decrementar n tras procesar el elememento   
-    jz fin_min ; si n=1 no entrar al ciclo por que es un solo elemento
+    INC SI ; avanzar al siguiente elemento
+    DEC CX  ; decrementar n tras procesar el elememento   
+    JZ fin_min ; si n=1 no entrar al ciclo por que es un solo elemento
 
     min_bug: 
 
         MOV DL, [BX + SI]
         CMP DL,AL ;COMPARAR ELEMENTOS CON EL MINIMO ACTUAL
 
-        jge nomenor   ; si DL mayor o igual a  AL, nuevo minimo ; aca cambiar el de maximo. ##
-        mov AL,DL  ; actualización 
+        JGE nomenor   ; si DL mayor o igual a  AL, nuevo minimo ; aca cambiar el de maximo. ##
+        MOV AL,DL  ; actualización 
 
     nomenor:
-        inc SI
+        INC SI
         LOOP min_bug
         JMP fin_min
 
     min_cero:
-        mov AL,7Fh 
+        MOV AL,7Fh 
    ;//////////////////////////////////////////////////////////////////////////
     fin_min: ; aca; 
         CBW   ; EXTERDER EL SIGNO. 
@@ -513,7 +517,7 @@ Min_arreglo PROC
         POP DX
         POP CX
         POP BX
-        RET
+        ret
 
 Min_arreglo ENDP
 
@@ -539,18 +543,18 @@ Mayor_T_arreglo PROC
          jg esmayor ; // el salto que tiene que dar si es mayo a la otra etiqueta; 
 
         mayor_continuar:
-        add SI,1 ; avanza 1  byte 
-        loop bucle
+        ADD SI,1 ; avanza 1  byte 
+        LOOP bucle
         POP DX
         POP SI
         POP CX
         POP BX
 
-        RET
+        ret
     esmayor:
             ADD AX,1 ; aumenta el contador 
 
-            jmp mayor_continuar 
+            JMP mayor_continuar 
 Mayor_T_arreglo ENDP
 
 
@@ -632,7 +636,7 @@ Main_loop PROC
         POP CX                  ; Se restaura el contador del bucle
         LOOP bucle_filas        ; Decrementar CX; si CX != 0, repetir el ciclo
     
-        RET
+        ret
 Main_loop ENDP
 
 end main
