@@ -14,7 +14,7 @@
 ;========================================================================
 .data
     ; Datos de los arreglos
-    N           DW  8, 1, 4, 4, 64, 64            ; Dimensiones de 16 bits (DW)
+    N           DW  8, 1, 4, 4, 64, 640            ; Dimensiones de 16 bits (DW)
     T           DB  5, -7, -5, 5, 126, -128       ; Umbrales de 8 bits con signo (DB)
     Cantidad    EQU  6                            ; Cantidad de arreglos a evaluar
 
