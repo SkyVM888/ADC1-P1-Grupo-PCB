@@ -104,3 +104,11 @@ Al ejecutar el programa, se mostrarán en pantalla las siguientes métricas calc
 - Conteo_C: Cantidad de elementos estrictamente mayores al umbral $T$.
 
 En caso de no cumplir con la condición $1 \le N \le 64$, el arreglo correspondiente a dicho N no será evaluado y se indicará `ERROR` como resultado.
+
+
+## 📌 Datos de la Entrega Final
+
+- **Repositorio:** [ADC1-P1-Grupo-PCB](https://github.com/SkyVM888/ADC1-P1-Grupo-PCB)
+- **Nombre de la Etiqueta (Tag):** `P1-Entrega`
+- **Identificador del Commit (Hash):** `09d7487`
+- **Enlace a la Release/Tag:** [Ver Release P1-Entrega en GitHub](https://github.com/SkyVM888/ADC1-P1-Grupo-PCB/releases/tag/P1-Entrega)
