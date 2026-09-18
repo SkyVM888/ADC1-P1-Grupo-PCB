@@ -14,9 +14,9 @@
 ;========================================================================
 .data
     ; Datos de los arreglos
-    N           DW  8, 1, 4, 4, 64, 64            ; Dimensiones de 16 bits (DW)
-    T           DB  5, -7, -5, 5, 126, -128       ; Umbrales de 8 bits con signo (DB)
-    Cantidad    EQU  6                             ; Cantidad de arreglos a evaluar
+    N           DW  8, 1, 4, 4, 64, 64, 0, 65            ; Dimensiones de 16 bits (DW)
+    T           DB  5, -7, -5, 5, 126, -128, 1, 1       ; Umbrales de 8 bits con signo (DB)
+    Cantidad    EQU  8                            ; Cantidad de arreglos a evaluar
 
     ; Arreglos definidos
     arreglo1    DB  -12, 0, 18, -5, 127, -128, 18, 5
@@ -25,11 +25,14 @@
     arreglo4    DB  5, 5, 5, 5
     arreglo5    DB  64 dup (127)
     arreglo6    DB  64 dup (-128)
+    arreglo7    DB  64 dup (1)
+    arreglo8    DB  64 dup (1)
 
     ; Matriz de arreglos
     
     Matriz      DW OFFSET arreglo1, OFFSET arreglo2, OFFSET arreglo3 
                 DW OFFSET arreglo4, OFFSET arreglo5, OFFSET arreglo6
+                DW OFFSET arreglo7, OFFSET arreglo8
 
     ; //// Matrices de cálculos ////
 
@@ -45,6 +48,20 @@
     ; Contador Conteo_C (Muestras > T): 16 bits sin signo
     Conteo_C    DW Cantidad dup (?)
 
+    ; //// Mensajes de impresión ////
+
+    msg_arreglo     DB  'Arreglos$'
+    msg_N           DB  'N$'
+    msg_T           DB  'T$'
+    msg_minimo      DB  'Min$'
+    msg_maximo      DB  'Max$'
+    msg_suma        DB  'Suma$'
+    msg_conteo      DB  'Conteo_C$'
+    msg_error       DB  'ERROR$'
+
+    salto_linea     DB  13, 10, '$'
+    linea_tabla     DB  '------------------------------------------------------------------',13,10,'$'
+
 ;========================================================================
 .code
 
@@ -55,6 +72,15 @@ main proc
     ; Inicio del Loop Principal
     mov BX, OFFSET Matriz   ; <---------Asignar Matriz de arreglos
     call Main_loop
+
+    ; Imprimir resultados
+    call Print_results
+
+    ; Imprimir 2 saltos de línea para empujar el cursos hacia abajo
+    MOV DX, OFFSET salto_linea
+    CALL print
+    MOV DX, OFFSET salto_linea
+    CALL print
 
     call endprogram
 main endp
@@ -82,6 +108,274 @@ print proc
     int 21h
     ret
 print endp
+
+; Funcion de imprimir TAB
+print_tab proc
+    mov DL, 09h
+    mov AH, 02h
+    int 21h
+    ret
+print_tab endp
+
+; Funcion de imprimir texto seguido de TAB
+print_tabla proc
+    CALL print
+    CALL print_tab
+    ret
+print_tabla endp
+
+; Funcion de imprimir numero
+Print_num proc
+
+    PUSH AX
+    PUSH BX
+    PUSH CX
+    PUSH DX
+
+    ; Verificar si el número es negativo
+    CMP AX, 0
+    JGE numero_positivo
+
+    ; Imprimir signo negativo
+    PUSH AX
+    MOV DL, '-'
+    MOV AH, 02h
+    INT 21h
+    POP AX
+
+    ; Convertir el número a positivo
+    NEG AX
+
+    numero_positivo:
+
+        ; Caso especial: AX = 0
+        CMP AX, 0
+        JNE convertir
+
+        MOV DL, '0'
+        MOV AH, 02h
+        INT 21h
+        JMP fin_num
+
+    convertir:
+
+        XOR CX, CX
+        MOV BX, 10
+
+    dividir:
+
+        XOR DX, DX
+        DIV BX
+
+        PUSH DX
+        INC CX
+
+        CMP AX, 0
+        JNE dividir
+
+    imprimir_digitos:
+
+        POP DX
+        ADD DL, '0'
+
+        MOV AH, 02h
+        INT 21h
+
+        LOOP imprimir_digitos
+
+    fin_num:
+
+        POP DX
+        POP CX
+        POP BX
+        POP AX
+
+        ret
+
+Print_num endp
+
+; Imprimir resultados en formato de tabla
+Print_results PROC
+
+    PUSH AX
+    PUSH BX
+    PUSH CX
+    PUSH DX
+    PUSH SI
+    PUSH DI
+
+    XOR DI, DI                  ; DI = índice de arreglo
+    MOV CX, Cantidad            ; CX = cantidad de arreglos
+
+    ; =========================================================
+    ; Encabezado de la tabla
+    ; =========================================================
+
+    MOV DX, OFFSET msg_arreglo
+    CALL print_tabla
+
+    MOV DX, OFFSET msg_N
+    CALL print_tabla
+
+    MOV DX, OFFSET msg_T
+    CALL print_tabla
+
+    MOV DX, OFFSET msg_minimo
+    CALL print_tabla
+
+    MOV DX, OFFSET msg_maximo
+    CALL print_tabla
+
+    MOV DX, OFFSET msg_suma
+    CALL print_tabla
+
+    MOV DX, OFFSET msg_conteo
+    CALL print
+
+    MOV DX, OFFSET salto_linea
+    CALL print
+
+    ; Línea separadora
+    MOV DX, OFFSET linea_tabla
+    CALL print
+
+
+    ; =========================================================
+    ; Imprimir filas
+    ; =========================================================
+
+imprimir_arreglo:
+
+    ; -----------------------------------------
+    ; Arreglo
+    ; -----------------------------------------
+
+    MOV AX, DI
+    INC AX
+    CALL Print_num
+    CALL print_tab
+    CALL print_tab
+
+    ; -----------------------------------------
+    ; N
+    ; -----------------------------------------
+
+    MOV SI, DI
+    SHL SI, 1
+
+    MOV AX, N[SI]
+    CALL Print_num
+    CALL print_tab
+
+    ; -----------------------------------------
+    ; T
+    ; -----------------------------------------
+
+    XOR AX, AX
+    MOV AL, T[DI]
+    CBW
+    CALL Print_num
+    CALL print_tab
+
+    ; -----------------------------------------
+    ; Verificar si el arreglo es inválido
+    ; -----------------------------------------
+
+    CMP Conteo_C[SI], 0FFFFh
+    JE imprimir_error
+
+    ; -----------------------------------------
+    ; Minimo
+    ; -----------------------------------------
+
+    XOR AX, AX
+    MOV AL, minimo[DI]
+    CBW
+    CALL Print_num
+    CALL print_tab
+
+    ; -----------------------------------------
+    ; Maximo
+    ; -----------------------------------------
+
+    XOR AX, AX
+    MOV AL, maximo[DI]
+    CBW
+    CALL Print_num
+    CALL print_tab
+
+    ; -----------------------------------------
+    ; Suma
+    ; -----------------------------------------
+
+    MOV AX, suma[SI]
+    CALL Print_num
+    CALL print_tab
+
+    ; -----------------------------------------
+    ; Conteo_C
+    ; -----------------------------------------
+
+    MOV AX, Conteo_C[SI]
+    CALL Print_num
+
+    JMP siguiente_arreglo
+
+
+    ; =========================================================
+    ; Caso de error
+    ; =========================================================
+
+imprimir_error:
+
+    ; Minimo
+    MOV DX, OFFSET msg_error
+    CALL print
+    CALL print_tab
+
+    ; Maximo
+    MOV DX, OFFSET msg_error
+    CALL print
+    CALL print_tab
+
+    ; Suma
+    MOV DX, OFFSET msg_error
+    CALL print
+    CALL print_tab
+
+    ; Conteo_C
+    MOV DX, OFFSET msg_error
+    CALL print
+
+
+    ; =========================================================
+    ; Siguiente arreglo
+    ; =========================================================
+
+siguiente_arreglo:
+
+    MOV DX, OFFSET salto_linea
+    CALL print
+
+    INC DI
+    DEC CX
+    JZ fin_print_results
+
+    JMP imprimir_arreglo
+
+
+fin_print_results:
+
+    POP DI
+    POP SI
+    POP DX
+    POP CX
+    POP BX
+    POP AX
+
+    RET
+
+Print_results ENDP
 
 ; Cierre de Programa
 endprogram proc
