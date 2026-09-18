@@ -94,12 +94,13 @@ test
 
 ## 📊 Resultados Esperados
 
-Al ejecutar el programa, se mostrarán en pantalla las siguientes métricas calculadas sobre los datos del arreglo:
+Al ejecutar el programa, se mostrarán en pantalla las siguientes métricas calculadas sobre los datos de los arreglos:
+- Arreglos: Numero del arreglo evaluado.
 - N: Dimensión del arreglo evaluado.
 - T: Umbral de comparación (8 bits con signo).
-- Mínimo: Valor mínimo encontrado en el arreglo.
-- Máximo: Valor máximo encontrado en el arreglo.
+- Mín: Valor mínimo encontrado en el arreglo.
+- Máx: Valor máximo encontrado en el arreglo.
 - Suma: Suma total de los elementos.
-- Mayores que T: Cantidad de elementos estrictamente mayores al umbral $T$.
+- Conteo_C: Cantidad de elementos estrictamente mayores al umbral $T$.
 
-En caso de no cumplir con la condición $1 \le N \le 64$, el arreglo correspondiente a dicho N no será evaluado y se indica `ERROR`
+En caso de no cumplir con la condición $1 \le N \le 64$, el arreglo correspondiente a dicho N no será evaluado y se indicará `ERROR` como resultado.
