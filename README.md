@@ -40,3 +40,66 @@ Las modificaciones de los datos de entrada se realizan directamente en el archiv
     arreglo1    DB  -12, 0, 18, -5, 127, -128, 18, 5
     ; ...
     Matriz      DW  OFFSET arreglo1, OFFSET arreglo2, ...
+```
+
+# Guía de Compilación y Ejecución (x86 Assembly - TASM)
+
+---
+
+## 📌 Requisitos Previos
+
+- **Archivo a procesar:** `main.asm` (En simulador se cambia automaticamente a `test.asm`)
+- **Entorno de simulación:** DOSBox o entorno compatible con DOS de 16 bits.
+- **Herramientas de desarrollo:** Turbo Assembler (`TASM.EXE`) y Turbo Linker (`TLINK.EXE`).
+
+---
+
+## 🛠️ Opciones de Ejecución
+
+### Opción 1: Ejecución Automática en Visual Studio Code (`Run ASM code`)
+
+Este método utiliza la extensión **MASM/TASM** integrada en VS Code para realizar la compilación, el enlace y la ejecución de manera automática dentro de DOSBox.
+
+1. Abra **Visual Studio Code**.
+2. Abra la carpeta del proyecto y seleccione el archivo `main.asm`.
+3. Haga clic derecho sobre la ventana de edición del archivo `main.asm`.
+4. Seleccione la opción **Run ASM code** en el menú contextual (o use la combinación de teclas rápida si la tiene configurada).
+5. La extensión iniciará DOSBox, compilará el archivo, generará el ejecutable y mostrará los resultados directamente en la consola.
+
+---
+
+### Opción 2: Compilación y Ejecución Manual (Línea de Comandos / DOSBox)
+
+Este método permite ensamblar, enlazar y ejecutar manualmente el programa desde la consola de comandos de DOSBox.
+
+#### 1. Abrir emulador DOSBox en VS Code
+1. Haga clic derecho sobre la ventana de edición del archivo `main.asm`.
+2. Seleccione la opción **Open Emulator** en el menú contextual (o use la combinación de teclas rápida si la tiene configurada).
+
+#### 2. Ensamblado
+Genera el archivo objeto (`test.obj`) a partir del archivo de código fuente:
+```cmd
+TASM test.asm
+```
+#### 3. Enlace
+Enlaza el archivo objeto para generar el ejecutable (`test.exe`):
+```cmd
+TLINK test.obj
+```
+#### 4. Ejecución
+Ejecute el programa generado en la consola:
+```cmd
+test
+```
+
+## 📊 Resultados Esperados
+
+Al ejecutar el programa, se mostrarán en pantalla las siguientes métricas calculadas sobre los datos del arreglo:
+N: Dimensión del arreglo evaluado.
+T: Umbral de comparación (8 bits con signo).
+Mínimo: Valor mínimo encontrado en el arreglo.
+Máximo: Valor máximo encontrado en el arreglo.
+Suma: Suma total de los elementos.
+Mayores que T: Cantidad de elementos estrictamente mayores al umbral $T$.
+
+En caso de no cumplir con la condición $1 \le N \le 64$, el arreglo correspondiente a dicho N no será evaluado y se indica `ERROR POR VALOR DE N`
