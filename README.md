@@ -33,9 +33,9 @@ Las modificaciones de los datos de entrada se realizan directamente en el archiv
 ```assembly
 .data
     ; Ejemplo de configuración en test.asm:
-    N           DW  8, 1, 4, 4, 64, 64            ; Dimensiones N (16 bits)
-    T           DB  5, -7, -5, 5, 126, -128       ; Umbrales T (8 bits con signo)
-    Cantidad    EQU 6                             ; Total de arreglos a procesar
+    N           DW  8, 1, 4, 4, 64, 64, 0, 65         ; Dimensiones N (16 bits)
+    T           DB  5, -7, -5, 5, 126, -128, 1, 1     ; Umbrales T (8 bits con signo)
+    Cantidad    EQU 8                                 ; Total de arreglos a procesar
 
     arreglo1    DB  -12, 0, 18, -5, 127, -128, 18, 5
     ; ...
