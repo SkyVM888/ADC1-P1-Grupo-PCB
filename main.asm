@@ -403,10 +403,10 @@ Suma_arreglo PROC
 ;---------------------------------------------------------------------------------------------------------------------------
 
     MOV CL,AL  ; Copiar el valor de N a CL  CL=N
-    MOV CH,0   ; poner el 0 la parte alta 
+    MOV CH,0   ; CX=0+AL = CX=8 
     
     MOV AX,0  
-    MOV DX,0 
+    MOV DX,0  ;ACOMULADOR DE LA SUMA 
     MOV SI,0  ;SI=0 INDICE
     
     MOV BX,BP     ;BX tiene la direccion del arreglo 
@@ -414,17 +414,17 @@ Suma_arreglo PROC
 
     suma_bucle:
 
-        MOV AL,[BX+SI] ;leer el elemento del arreglo
-        CBW   ; convertir al con signo a AX
+        MOV AL,[BX+SI] ;  leer el elemento del arreglo, más SI que es el indice
+        CBW   ; convertir AL con signo a AX 
 
-        ADD DX,AX  
+        ADD DX,AX  ; DX= O+AX----- DX ACUOMULA LA SUMA. 
 
-        ADD SI,1     ; debiera de avanzar 1bytes. 
-        LOOP suma_bucle ; repetir mientas cx sea diferente de 0. 
+        ADD SI,1     ; debiera de avanzar 1bytes, SI=SI+1. 
+        LOOP suma_bucle ; repetir mientas cx sea diferente de 0, CX-1 Y Pregunta si es 0. 
 
-        MOV AX,DX  ; pasar a la suma final de ax
+        MOV AX,DX  ; pasar a la suma a el registro AX
 
-        POP DX
+        POP DX    ; DEVOLVER LOS DATOS. 
         POP SI
         POP CX
         POP BX
@@ -439,32 +439,32 @@ Max_arreglo PROC
     PUSH SI
 
     MOV CX,AX ; GUARDAR EL N completo 
-    CMP CX,0   
+    CMP CX,0  ;COMPARATIVA CON 0 
     JE max_cero   ; N==0 preguntar 
 
     XOR SI,SI ; HACERLO 0 QUE ES LO MISMO QUE USAR EL MOV,0
-    MOV BX,BP   ; direc del array 
+    MOV BX,BP   ; BX PASA A TENER LA DIRECCIÓN DEL ARRGLO
     MOV AL,[BX + SI] ; PRIMER ELEMENTO  como minimo incial. 
 
-    INC SI ; avanzar al siguiente elemento
+    INC SI ; avanzar al siguiente elemento (YA QUE SE TOMO EL PRIMER MINIMO LOCAL)
     DEC CX  ; decrementar n tras procesar el elememento   
     JZ fin_max ; si n=1 no entrar al ciclo por que es un solo elemento
 
     max_bug: 
 
-        MOV DL, [BX + SI]
+        MOV DL, [BX + SI]   ; LEER ELEMENTO EN ESTE CASO ARRANCA CON S1=1, LEE SEGUNDO ELEMENTO 
         CMP DL,AL ;COMPARAR ELEMENTOS CON EL MINIMO ACTUAL
 
-        JLE nomayor   ; si DL mayor o igual a  AL, nuevo minimo ; aca cambiar el de maximo. ##
+        JLE nomayor   ; si DL es mayor o igual a  AL, nuevo minimo ; aca cambiar el de maximo. ##
         MOV AL,DL  ; actualización 
 
     nomayor:
-        INC SI
-        LOOP max_bug
-        JMP fin_max
+        INC SI     ; SI NO ES MAYOR AUNMENTAR EL CONTADOR PARA SEGUIR AL SIGUIETE ELEMENTO
+        LOOP max_bug  ; CX=CX-1 SI  NO ES VOLVER AL LOOP 
+        JMP fin_max   ; SI CX = 0 PASAR AL FINAL 
 
     max_cero:
-        MOV AL,80h 
+        MOV AL,80h    ;VALOR MAXIMO 
    ;//////////////////////////////////////////////////////////////////////////
     fin_max: ; aca; 
         CBW   ; EXTERDER EL SIGNO. 
